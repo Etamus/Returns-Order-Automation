@@ -1,0 +1,3 @@
+*.bas linguist-language=VBScript
+*.cls linguist-language=VBScript
+*.frm linguist-language=VBScript
