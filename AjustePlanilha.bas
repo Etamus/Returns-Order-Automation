@@ -1,22 +1,22 @@
-Attribute VB_Name = "MÛdulo1"
+Attribute VB_Name = "Modulo 2"
 Sub AjustarPlanilha()
 
     '======================================================================================================================
-    ' PARTE 0: CONFIGURA«’ES INICIAIS
-    ' DeclaraÁ„o de todas as vari·veis que ser„o utilizadas na macro.
+    ' PARTE 0: CONFIGURA√á√ïES INICIAIS
+    ' Declara√ß√£o de todas as vari√°veis que ser√£o utilizadas na macro.
     '======================================================================================================================
     Dim wsPortal As Worksheet, wsCriacao As Worksheet, wsCliente As Worksheet
     Dim lastRowPortal As Long, lastRowCriacao As Long, lastRowCliente As Long
     Dim i As Long
     
-    ' Dicion·rios s„o objetos que armazenam pares de chave-valor, muito eficientes para buscas.
+    ' Dicion√°rios s√£o objetos que armazenam pares de chave-valor, muito eficientes para buscas.
     Dim dictClientes As Object
     Set dictClientes = CreateObject("Scripting.Dictionary")
     
     Dim dictDuplicados As Object
     Set dictDuplicados = CreateObject("Scripting.Dictionary")
     
-    ' Vari·veis para a lÛgica de duplicados
+    ' Vari√°veis para a l√≥gica de duplicados
     Dim chaveConcatenada As Variant
     Dim grupoDuplicado As Object
     Dim chaveSubgrupo As Variant
@@ -29,17 +29,17 @@ Sub AjustarPlanilha()
     Dim corVerde As Long
     corVerde = RGB(169, 208, 142) 'Um tom de verde claro
 
-    ' Define as planilhas para evitar erros e facilitar a leitura do cÛdigo
+    ' Define as planilhas para evitar erros e facilitar a leitura do c√≥digo
     On Error GoTo TratamentoErro
     Set wsPortal = ThisWorkbook.Worksheets("Planilha Portal")
-    Set wsCriacao = ThisWorkbook.Worksheets("CriaÁ„o")
+    Set wsCriacao = ThisWorkbook.Worksheets("Cria√ß√£o")
     Set wsCliente = ThisWorkbook.Worksheets("Cliente")
     
-    ' Desativa a atualizaÁ„o de tela para a macro rodar muito mais r·pido
+    ' Desativa a atualiza√ß√£o de tela para a macro rodar muito mais r√°pido
     Application.ScreenUpdating = False
     
     '======================================================================================================================
-    ' PARTE 1: TRANSFER NCIA E FORMATA«√O DOS DADOS
+    ' PARTE 1: TRANSFER√äNCIA E FORMATA√á√ÉO DOS DADOS
     '======================================================================================================================
     
     lastRowCriacao = wsCriacao.Cells(wsCriacao.rows.Count, "A").End(xlUp).Row
@@ -76,7 +76,7 @@ Sub AjustarPlanilha()
     
     '======================================================================================================================
     ' PARTE 2: BUSCA DE CLIENTES (COM NOVA REGRA)
-    ' Procura o cÛdigo do cliente ou aplica a regra especial do "509".
+    ' Procura o c√≥digo do cliente ou aplica a regra especial do "509".
     '======================================================================================================================
     
     lastRowCliente = wsCliente.Cells(wsCliente.rows.Count, "A").End(xlUp).Row
@@ -93,13 +93,13 @@ Sub AjustarPlanilha()
     
     If lastRowCriacao > 1 Then
         For i = 2 To lastRowCriacao
-            ' ---> INÕCIO DA ALTERA«√O <---
-            ' Verifica se a coluna G contÈm "509". A funÁ„o InStr procura um texto dentro de outro.
+            ' ---> IN√çCIO DA ALTERA√á√ÉO <---
+            ' Verifica se a coluna G cont√©m "509". A fun√ß√£o InStr procura um texto dentro de outro.
             If InStr(wsCriacao.Cells(i, "G").Value, "509") > 0 Then
-                ' Se encontrou, aplica o cÛdigo especial
+                ' Se encontrou, aplica o c√≥digo especial
                 wsCriacao.Cells(i, "J").Value = "5002359"
             Else
-                ' Se n„o encontrou, executa a busca normal
+                ' Se n√£o encontrou, executa a busca normal
                 Dim chaveCliente As String
                 chaveCliente = Trim(wsCriacao.Cells(i, "B").Value)
                 
@@ -109,22 +109,22 @@ Sub AjustarPlanilha()
                     wsCriacao.Cells(i, "J").Value = "Sem Cadastro"
                 End If
             End If
-            ' ---> FIM DA ALTERA«√O <---
+            ' ---> FIM DA ALTERA√á√ÉO <---
             
             wsCriacao.Cells(i, "J").HorizontalAlignment = xlCenter
         Next i
     End If
 
     '======================================================================================================================
-    ' PARTE 3 E 4: VERIFICA«√O E PROCESSAMENTO DE DUPLICADOS (L”GICA OTIMIZADA)
+    ' PARTE 3 E 4: VERIFICA√á√ÉO E PROCESSAMENTO DE DUPLICADOS (L√ìGICA OTIMIZADA)
     '======================================================================================================================
     
     lastRowCriacao = wsCriacao.Cells(wsCriacao.rows.Count, "A").End(xlUp).Row
     
     If lastRowCriacao > 1 Then
-        ' 1. Cria uma "chave" para cada linha e agrupa os n˙meros das linhas duplicadas
+        ' 1. Cria uma "chave" para cada linha e agrupa os n√∫meros das linhas duplicadas
         For i = 2 To lastRowCriacao
-            Dim strChave As String ' Vari·vel tempor·ria para construir a chave
+            Dim strChave As String ' Vari√°vel tempor√°ria para construir a chave
             strChave = wsCriacao.Cells(i, "A").Value & "|" & wsCriacao.Cells(i, "B").Value & "|" & wsCriacao.Cells(i, "C").Value & "|" & wsCriacao.Cells(i, "F").Value & "|" & wsCriacao.Cells(i, "G").Value & "|" & wsCriacao.Cells(i, "J").Value
             
             If Not dictDuplicados.Exists(strChave) Then
@@ -136,11 +136,11 @@ Sub AjustarPlanilha()
             End If
         Next i
         
-        ' 2. Agora, percorre apenas os grupos que tÍm duplicados
+        ' 2. Agora, percorre apenas os grupos que t√™m duplicados
         For Each chaveConcatenada In dictDuplicados.Keys
             Set grupoDuplicado = dictDuplicados(chaveConcatenada)
             
-            If grupoDuplicado.Count > 1 Then ' Se for maior que 1, È um grupo de duplicados
+            If grupoDuplicado.Count > 1 Then ' Se for maior que 1, √© um grupo de duplicados
                 
                 ' PARTE 3: Pinta e marca TODAS as linhas do grupo como "Duplicado"
                 For Each linha In grupoDuplicado
@@ -164,7 +164,7 @@ Sub AjustarPlanilha()
                     dictSubgrupos(chaveSubgrupo).Add linha
                 Next linha
                 
-                ' Processa os subgrupos que tambÈm s„o duplicados (baseado na Coluna D)
+                ' Processa os subgrupos que tamb√©m s√£o duplicados (baseado na Coluna D)
                 For Each chaveSubgrupo In dictSubgrupos.Keys
                     If dictSubgrupos(chaveSubgrupo).Count > 1 Then
                         somaH = 0
@@ -190,7 +190,7 @@ Sub AjustarPlanilha()
     End If
 
 Conclusao:
-    ' Libera a memÛria dos objetos
+    ' Libera a mem√≥ria dos objetos
     Set wsPortal = Nothing
     Set wsCriacao = Nothing
     Set wsCliente = Nothing

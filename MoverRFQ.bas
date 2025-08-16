@@ -1,15 +1,15 @@
-Attribute VB_Name = "MÛdulo6"
+Attribute VB_Name = "Modulo 5"
 Sub MoverparaRFQ()
 
-    ' Desativa a atualizaÁ„o da tela para a macro rodar mais r·pido
+    ' Desativa a atualiza√ß√£o da tela para a macro rodar mais r√°pido
     Application.ScreenUpdating = False
 
-    ' DeclaraÁ„o das vari·veis das planilhas
+    ' Declara√ß√£o das vari√°veis das planilhas
     Dim wsCriacao As Worksheet
     Dim wsRFQ As Worksheet
     Dim wsPortal As Worksheet
 
-    ' DeclaraÁ„o de vari·veis de controle
+    ' Declara√ß√£o de vari√°veis de controle
     Dim ultLinhaCriacao As Long
     Dim ultLinhaPortal As Long
     Dim linhaDestinoInicio As Long
@@ -17,39 +17,39 @@ Sub MoverparaRFQ()
     Dim i As Long
     Dim rangeFinal As Range
 
-    ' Define as planilhas para facilitar a referÍncia
-    Set wsCriacao = ThisWorkbook.Sheets("CriaÁ„o")
+    ' Define as planilhas para facilitar a refer√™ncia
+    Set wsCriacao = ThisWorkbook.Sheets("Cria√ß√£o")
     Set wsRFQ = ThisWorkbook.Sheets("RFQ")
     Set wsPortal = ThisWorkbook.Sheets("Planilha Portal")
 
-    ' *** NOVO: Encontra a primeira linha em branco na aba RFQ para iniciar a inserÁ„o ***
+    ' *** NOVO: Encontra a primeira linha em branco na aba RFQ para iniciar a inser√ß√£o ***
     linhaDestinoInicio = wsRFQ.Cells(wsRFQ.rows.Count, "A").End(xlUp).Row + 1
-    ' Garante que, se a planilha estiver vazia, comece na linha 2 (caso tenha cabeÁalho na linha 1)
+    ' Garante que, se a planilha estiver vazia, comece na linha 2 (caso tenha cabe√ßalho na linha 1)
     If linhaDestinoInicio < 2 Then linhaDestinoInicio = 2
 
-    ' Encontra a ˙ltima linha com dados na coluna A da aba "CriaÁ„o"
+    ' Encontra a √∫ltima linha com dados na coluna A da aba "Cria√ß√£o"
     ultLinhaCriacao = wsCriacao.Cells(wsCriacao.rows.Count, "A").End(xlUp).Row
     
-    ' Sai da macro se n„o houver dados novos para adicionar na aba "CriaÁ„o"
+    ' Sai da macro se n√£o houver dados novos para adicionar na aba "Cria√ß√£o"
     If ultLinhaCriacao < 2 Then
-        MsgBox "N„o h· dados novos na aba 'CriaÁ„o' para serem processados.", vbInformation
+        MsgBox "N√£o h√° dados novos na aba 'Cria√ß√£o' para serem processados.", vbInformation
         Exit Sub
     End If
 
-    ' Copia o intervalo de A2 atÈ K da aba "CriaÁ„o" e cola apenas os VALORES na prÛxima linha livre da "RFQ"
+    ' Copia o intervalo de A2 at√© K da aba "Cria√ß√£o" e cola apenas os VALORES na pr√≥xima linha livre da "RFQ"
     wsCriacao.Range("A2:K" & ultLinhaCriacao).Copy
     wsRFQ.Range("A" & linhaDestinoInicio).PasteSpecial Paste:=xlPasteValues
-    Application.CutCopyMode = False ' Limpa a ·rea de transferÍncia
+    Application.CutCopyMode = False ' Limpa a √°rea de transfer√™ncia
 
-    ' Encontra a ˙ltima linha com dados na coluna R da aba "Planilha Portal"
+    ' Encontra a √∫ltima linha com dados na coluna R da aba "Planilha Portal"
     ultLinhaPortal = wsPortal.Cells(wsPortal.rows.Count, "R").End(xlUp).Row
 
     ' Copia os dados da coluna R da "Planilha Portal" e cola apenas os VALORES na coluna I da "RFQ"
     wsPortal.Range("R2:R" & ultLinhaPortal).Copy
     wsRFQ.Range("I" & linhaDestinoInicio).PasteSpecial Paste:=xlPasteValues
-    Application.CutCopyMode = False ' Limpa a ·rea de transferÍncia
+    Application.CutCopyMode = False ' Limpa a √°rea de transfer√™ncia
 
-    ' Define a ˙ltima linha do bloco recÈm-adicionado
+    ' Define a √∫ltima linha do bloco rec√©m-adicionado
     ultLinhaFinal = wsRFQ.Cells(wsRFQ.rows.Count, "A").End(xlUp).Row
 
     ' Percorre APENAS O BLOCO NOVO de baixo para cima para remover as linhas com coluna I vazia
@@ -59,19 +59,19 @@ Sub MoverparaRFQ()
         End If
     Next i
 
-    ' Encontra a ˙ltima linha novamente apÛs a possÌvel exclus„o de linhas
+    ' Encontra a √∫ltima linha novamente ap√≥s a poss√≠vel exclus√£o de linhas
     ultLinhaFinal = wsRFQ.Cells(wsRFQ.rows.Count, "A").End(xlUp).Row
 
-    ' Aplica formataÁ„o e data SE algum dado novo foi efetivamente adicionado
+    ' Aplica formata√ß√£o e data SE algum dado novo foi efetivamente adicionado
     If ultLinhaFinal >= linhaDestinoInicio Then
         
-        ' Define o intervalo final que contÈm apenas os novos dados v·lidos
+        ' Define o intervalo final que cont√©m apenas os novos dados v√°lidos
         Set rangeFinal = wsRFQ.Range("A" & linhaDestinoInicio & ":L" & ultLinhaFinal)
 
         ' Preenche a data atual na coluna L para todas as linhas novas
         wsRFQ.Range("L" & linhaDestinoInicio & ":L" & ultLinhaFinal).Value = Date
 
-        ' *** NOVO: Aplica formataÁ„o (centralizaÁ„o e BORDAS BRANCAS) ***
+        ' *** NOVO: Aplica formata√ß√£o (centraliza√ß√£o e BORDAS BRANCAS) ***
         With rangeFinal
             .HorizontalAlignment = xlCenter
             .VerticalAlignment = xlCenter
@@ -83,10 +83,10 @@ Sub MoverparaRFQ()
         End With
     End If
 
-    ' Reativa a atualizaÁ„o da tela
+    ' Reativa a atualiza√ß√£o da tela
     Application.ScreenUpdating = True
 
-    ' Exibe uma mensagem de conclus„o
+    ' Exibe uma mensagem de conclus√£o
     MsgBox "Finalizado.", vbInformation
 
     Call LimparBase

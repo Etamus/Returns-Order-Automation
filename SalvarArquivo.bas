@@ -1,6 +1,6 @@
-Attribute VB_Name = "MÛdulo5"
+Attribute VB_Name = "Modulo 6"
 Sub SalvarAbaComoArquivo()
-    ' Desativa atualizaÁıes de tela para performance.
+    ' Desativa atualiza√ß√µes de tela para performance.
     Application.ScreenUpdating = False
 
     Dim abaOrigem As Worksheet
@@ -14,53 +14,53 @@ Sub SalvarAbaComoArquivo()
     Dim dadosRange As Range
     Dim cabecalhoRange As Range
 
-    ' --- CONFIGURA«√O INICIAL ---
-    ' Define a aba de onde os dados ser„o copiados.
+    ' --- CONFIGURA√á√ÉO INICIAL ---
+    ' Define a aba de onde os dados ser√£o copiados.
     On Error GoTo ErroPlanilhaInexistente
     Set abaOrigem = ThisWorkbook.Sheets("Planilha Portal")
-    On Error GoTo 0 ' Restaura o tratamento de erro padr„o
+    On Error GoTo 0 ' Restaura o tratamento de erro padr√£o
 
-    ' Encontra a ˙ltima linha com dados na coluna A.
+    ' Encontra a √∫ltima linha com dados na coluna A.
     ultimaLinha = abaOrigem.Cells(abaOrigem.rows.Count, "A").End(xlUp).Row
     
-    ' Se n„o houver dados (alÈm do cabeÁalho), encerra a macro.
+    ' Se n√£o houver dados (al√©m do cabe√ßalho), encerra a macro.
     If ultimaLinha <= 1 Then
-        MsgBox "N„o h· dados para exportar na aba 'Planilha Portal'.", vbExclamation, "Aviso"
+        MsgBox "N√£o h√° dados para exportar na aba 'Planilha Portal'.", vbExclamation, "Aviso"
         Exit Sub
     End If
 
-    ' Define o intervalo de dados e o intervalo do cabeÁalho.
+    ' Define o intervalo de dados e o intervalo do cabe√ßalho.
     Set dadosRange = abaOrigem.Range("A1:U" & ultimaLinha)
     Set cabecalhoRange = abaOrigem.Range("A1:U1")
 
-    ' --- CRIA«√O DO NOVO ARQUIVO ---
+    ' --- CRIA√á√ÉO DO NOVO ARQUIVO ---
     ' Cria uma nova pasta de trabalho.
     Set novoWorkbook = Workbooks.Add
     Set novaAba = novoWorkbook.Sheets(1)
 
-    ' --- C”PIA E COLAGEM DOS DADOS ---
+    ' --- C√ìPIA E COLAGEM DOS DADOS ---
     ' 1. Copia os dados da origem.
     dadosRange.Copy
-    ' 2. Cola como valores (sem formataÁ„o).
+    ' 2. Cola como valores (sem formata√ß√£o).
     novaAba.Range("A1").PasteSpecial Paste:=xlPasteValues
     Application.CutCopyMode = False
 
-    ' --- APLICA«√O DAS FORMATA«’ES ---
-    ' 1. Copia o cabeÁalho da origem.
+    ' --- APLICA√á√ÉO DAS FORMATA√á√ïES ---
+    ' 1. Copia o cabe√ßalho da origem.
     cabecalhoRange.Copy
-    ' 2. Cola apenas a formataÁ„o no novo cabeÁalho.
+    ' 2. Cola apenas a formata√ß√£o no novo cabe√ßalho.
     novaAba.Range("A1").PasteSpecial Paste:=xlPasteFormats
     Application.CutCopyMode = False
     
-    ' 3. APLICA A FORMATA«√O DE DATA NA COLUNA T
-    ' Formata a coluna inteira, exceto o cabeÁalho, como data.
+    ' 3. APLICA A FORMATA√á√ÉO DE DATA NA COLUNA T
+    ' Formata a coluna inteira, exceto o cabe√ßalho, como data.
     novaAba.Range("T2:T" & ultimaLinha).NumberFormat = "dd/mm/yyyy"
 
     ' --- SALVANDO O ARQUIVO ---
     ' Define o caminho completo diretamente.
-    caminhoCompleto = "C:\Users\lopesm21\Downloads\Macros\Novas Macros\HistÛrico de CriaÁ„o"
+    caminhoCompleto = "C:\Users\lopesm21\Downloads\Macros\Novas Macros\Hist√≥rico de Cria√ß√£o"
 
-    ' Cria a pasta se ela n„o existir.
+    ' Cria a pasta se ela n√£o existir.
     If Dir(caminhoCompleto, vbDirectory) = "" Then
        MkDir caminhoCompleto
     End If
@@ -79,26 +79,26 @@ Sub SalvarAbaComoArquivo()
     End With
     On Error GoTo 0
 
-    ' Reativa as atualizaÁıes de tela.
+    ' Reativa as atualiza√ß√µes de tela.
     Application.ScreenUpdating = True
 
-    ' --- MENSAGEM DE CONCLUS√O ---
-    MsgBox "Arquivo '" & nomeArquivo & "' foi criado.", vbInformation, "ExportaÁ„o ConcluÌda"
+    ' --- MENSAGEM DE CONCLUS√ÉO ---
+    MsgBox "Arquivo '" & nomeArquivo & "' foi criado.", vbInformation, "Exporta√ß√£o Conclu√≠da"
     Exit Sub
 
-' --- SE«’ES DE TRATAMENTO DE ERRO ---
+' --- SE√á√ïES DE TRATAMENTO DE ERRO ---
 ErroPlanilhaInexistente:
-    MsgBox "Erro: A aba 'Planilha Portal' n„o foi encontrada." & vbCrLf & _
+    MsgBox "Erro: A aba 'Planilha Portal' n√£o foi encontrada." & vbCrLf & _
            "Por favor, verifique o nome da aba e tente novamente.", _
-           vbCritical, "Erro na ExecuÁ„o"
+           vbCritical, "Erro na Execu√ß√£o"
     Application.ScreenUpdating = True
     Exit Sub
 
 ErroAoSalvar:
     MsgBox "Erro ao salvar o arquivo." & vbCrLf & _
-           "Verifique se o arquivo '" & nomeArquivo & "' j· est· aberto.", _
+           "Verifique se o arquivo '" & nomeArquivo & "' j√° est√° aberto.", _
            vbCritical, "Erro ao Salvar"
-    ' Garante que os alertas e a atualizaÁ„o de tela sejam reativados.
+    ' Garante que os alertas e a atualiza√ß√£o de tela sejam reativados.
     Application.DisplayAlerts = True
     Application.ScreenUpdating = True
     Exit Sub

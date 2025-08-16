@@ -5,7 +5,7 @@ O projeto está organizado de forma modular, facilitando manutenção, versionam
 
 ---
 
-## 🚀 Como Utilizar
+## Como Utilizar
 
 ### 🔹 Usar a versão pronta
 1. Acesse a pasta [`build/`](./build).  
@@ -20,14 +20,14 @@ O projeto está organizado de forma modular, facilitando manutenção, versionam
 
 ---
 
-## 🛠️ Desenvolvimento
+## Desenvolvimento
 
 - **Modularização** → Código separado em múltiplos módulos `.bas`.  
 - **Compatibilidade** → Testado no Excel 2016, 2019 e Microsoft 365.  
 
 ---
 
-### 🔧 Contribuir
+### Contribuir
 1. Faça um **fork** deste repositório.  
 2. Clone para sua máquina:  
    ```bash

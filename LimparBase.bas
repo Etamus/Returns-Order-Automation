@@ -1,16 +1,16 @@
-Attribute VB_Name = "MÛdulo2"
+Attribute VB_Name = "Modulo 4"
 Sub LimparBase()
-    ' Desativa a atualizaÁ„o de tela para a macro rodar mais r·pido
+    ' Desativa a atualiza√ß√£o de tela para a macro rodar mais r√°pido
     Application.ScreenUpdating = False
 
     ' Chama a rotina de limpeza para cada aba especificada
     Call LimparAba("Planilha Portal")
-    Call LimparAba("CriaÁ„o")
+    Call LimparAba("Cria√ß√£o")
 
-    ' Reativa a atualizaÁ„o de tela
+    ' Reativa a atualiza√ß√£o de tela
     Application.ScreenUpdating = True
     
-    ' Exibe uma mensagem informando que o processo foi concluÌdo
+    ' Exibe uma mensagem informando que o processo foi conclu√≠do
     MsgBox "Finalizado.", vbInformation, "Processo Finalizado"
 End Sub
 
@@ -26,19 +26,19 @@ Private Sub LimparAba(nomeDaAba As String)
 
     ' Verifica se a aba existe antes de continuar
     If Not ws Is Nothing Then
-        ' Encontra a ˙ltima linha com dados na coluna A
+        ' Encontra a √∫ltima linha com dados na coluna A
         ultimaLinha = ws.Cells(ws.rows.Count, "A").End(xlUp).Row
         
         ' Define o intervalo a ser limpo e formatado, a partir da linha 2
-        ' Se houver dados, o intervalo vai da linha 2 atÈ a ˙ltima linha com conte˙do.
+        ' Se houver dados, o intervalo vai da linha 2 at√© a √∫ltima linha com conte√∫do.
         ' Se a aba estiver vazia a partir da linha 2, nada acontece.
         If ultimaLinha >= 2 Then
             Set intervalo = ws.Range("A2:" & ws.Cells(ultimaLinha, ws.Columns.Count).Address)
             
-            ' 1. Limpa todo o conte˙do do intervalo
+            ' 1. Limpa todo o conte√∫do do intervalo
             intervalo.ClearContents
             
-            ' 2. Pinta o interior de todas as cÈlulas de branco
+            ' 2. Pinta o interior de todas as c√©lulas de branco
             With intervalo.Interior
                 .Pattern = xlSolid
                 .PatternColorIndex = xlAutomatic
@@ -47,7 +47,7 @@ Private Sub LimparAba(nomeDaAba As String)
                 .PatternTintAndShade = 0
             End With
             
-            ' 3. Aplica bordas brancas em todas as cÈlulas do intervalo
+            ' 3. Aplica bordas brancas em todas as c√©lulas do intervalo
             With intervalo.Borders
                 .LineStyle = xlContinuous
                 .Color = vbWhite
@@ -55,7 +55,7 @@ Private Sub LimparAba(nomeDaAba As String)
             End With
         End If
     Else
-        ' Alerta o usu·rio se uma das abas n„o for encontrada
-        MsgBox "A aba '" & nomeDaAba & "' n„o foi encontrada. Verifique o nome e tente novamente.", vbExclamation, "Aba N„o Encontrada"
+        ' Alerta o usu√°rio se uma das abas n√£o for encontrada
+        MsgBox "A aba '" & nomeDaAba & "' n√£o foi encontrada. Verifique o nome e tente novamente.", vbExclamation, "Aba N√£o Encontrada"
     End If
 End Sub
