@@ -1,6 +1,6 @@
-# 📊 Projeto VBA – Automação no Excel
+# 📊 Macro para Criação de Ordem Inversa - Returns
 
-Macros desenvolvidas em **VBA (Visual Basic for Applications)** para automação de processos no **Microsoft Excel**.  
+Macro desenvolvida em **VBA (Visual Basic for Applications)** para automação de processos no **Microsoft Excel**.  
 O projeto está organizado de forma modular, facilitando manutenção, versionamento e reutilização do código.
 
 ---

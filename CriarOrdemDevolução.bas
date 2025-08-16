@@ -1,3 +1,4 @@
+Attribute VB_Name = "Modulo 3"
 Sub CriarOrdemDevolucao()
 
 ' Declaração de todas as variáveis utilizadas na macro.
@@ -15,7 +16,6 @@ Dim resultRow As Variant
 Dim lastRow As Long
 Dim i As Long
 Dim firstRow As Long
-Dim isFirstItem As Boolean
 
 Dim strTexto As String
 Dim tipo As String
@@ -30,13 +30,12 @@ Dim parceiro As String
 Dim Msg36 As String
 Dim mensagemerro As String
 Dim ois1 As String
-Dim Itemq As Double ' Alterado para Double
+Dim Itemq As Double
 Dim Itemloop As String
 Dim Item2 As String
 Dim notaFiscalOriginal As String
 Dim notaFiscalFormatada As String
 
-' Variáveis para a nova lógica de busca e verificação
 Dim motivoOriginalCriacao As String
 Dim codigoParaBusca As String
 Dim motivoFinalParaSAP As String
@@ -45,7 +44,11 @@ Dim lastRowCodigo As Long
 Dim j As Long
 Dim posAbreParenteses As Integer
 Dim posFechaParenteses As Integer
-Dim skipGroup As Boolean
+
+' *** Variáveis do código antigo que serão restauradas ***
+Dim cont As Integer
+Dim conterr As Integer
+Dim contmaior As Integer
 
 ' Ativa a aba "Criação" e define o cabeçalho para o nome do solicitante.
 Sheets("Criação").Activate
@@ -108,11 +111,10 @@ For i = 2 To lastRow
     cliente = Trim(Sheets("Criação").Cells(i, "B").Value)
 
     If nf <> "" And cliente <> "" Then
-        ' Agrupa apenas se a coluna K for "duplicado". Caso contrário, cria uma chave única.
         If UCase(Trim(Sheets("Criação").Cells(i, "K").Value)) = "DUPLICADO" Then
-            key = nf & "|" & cliente ' Chave compartilhada para itens duplicados
+            key = nf & "|" & cliente
         Else
-            key = nf & "|" & cliente & "|" & i ' Chave única para itens individuais
+            key = nf & "|" & cliente & "|" & i
         End If
 
         If Not dictInvoices.Exists(key) Then
@@ -128,9 +130,8 @@ For Each invoiceKey In dictInvoices.Keys
     Set invoiceRows = dictInvoices(invoiceKey)
     firstRow = invoiceRows(1)
 
-    ' Verifica se a primeira linha do grupo já foi processada
     If Trim(Sheets("Criação").Cells(firstRow, "I").Value) <> "" Then
-        GoTo ProximoGrupo ' Pula para o próximo grupo de NF/Cliente
+        GoTo ProximoGrupo
     End If
 
     session.findById("wnd[0]/tbar[0]/okcd").Text = "/nVA01"
@@ -240,55 +241,70 @@ volta3:
     session.findById("wnd[0]").sendVKey 0
     session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/ssubHEADER_FRAME:SAPMV45A:4440/cmbVBAK-LIFSK").key = " "
     
-motivoOriginalCriacao = Trim(CStr(Sheets("Criação").Cells(firstRow, "G").Value))
-posAbreParenteses = InStr(motivoOriginalCriacao, "(")
-posFechaParenteses = InStr(motivoOriginalCriacao, ")")
+    '--- Início da Lógica de Motivo (do código novo)
+    motivoOriginalCriacao = Trim(CStr(Sheets("Criação").Cells(firstRow, "G").Value))
+    posAbreParenteses = InStr(motivoOriginalCriacao, "(")
+    posFechaParenteses = InStr(motivoOriginalCriacao, ")")
 
-If posAbreParenteses > 0 And posFechaParenteses > posAbreParenteses Then
-    codigoParaBusca = Trim(Mid(motivoOriginalCriacao, posAbreParenteses + 1, posFechaParenteses - posAbreParenteses - 1))
-Else
-    codigoParaBusca = ""
-End If
+    If posAbreParenteses > 0 And posFechaParenteses > posAbreParenteses Then
+        codigoParaBusca = Trim(Mid(motivoOriginalCriacao, posAbreParenteses + 1, posFechaParenteses - posAbreParenteses - 1))
+    Else
+        codigoParaBusca = ""
+    End If
 
-' --- Ajuste para tratar 90 como 090 e 92 como 092 ---
-If codigoParaBusca = "90" Then
-    codigoParaBusca = "090"
-ElseIf codigoParaBusca = "92" Then
-    codigoParaBusca = "092"
-End If
-' ----------------------------------------------------
+    If codigoParaBusca = "90" Then
+        codigoParaBusca = "090"
+    ElseIf codigoParaBusca = "92" Then
+        codigoParaBusca = "092"
+    End If
 
-motivoFinalParaSAP = ""
-If codigoParaBusca <> "" Then
-    Set wsCodigo = ThisWorkbook.Sheets("Código")
-    lastRowCodigo = wsCodigo.Cells(wsCodigo.rows.Count, "A").End(xlUp).Row
+    motivoFinalParaSAP = ""
+    If codigoParaBusca <> "" Then
+        Set wsCodigo = ThisWorkbook.Sheets("Código")
+        lastRowCodigo = wsCodigo.Cells(wsCodigo.rows.Count, "A").End(xlUp).Row
 
-    For j = 1 To lastRowCodigo
-        If Trim(CStr(Left(wsCodigo.Cells(j, "A").Value, Len(codigoParaBusca)))) = codigoParaBusca Then
-            motivoFinalParaSAP = Trim(CStr(Left(wsCodigo.Cells(j, "A").Value, 3)))
-            Exit For
-        End If
-    Next j
-End If
-
-
+        For j = 1 To lastRowCodigo
+            If Trim(CStr(Left(wsCodigo.Cells(j, "A").Value, Len(codigoParaBusca)))) = codigoParaBusca Then
+                motivoFinalParaSAP = Trim(CStr(Left(wsCodigo.Cells(j, "A").Value, 3)))
+                Exit For
+            End If
+        Next j
+    End If
+    
     If motivoFinalParaSAP <> "" Then
         session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/ssubHEADER_FRAME:SAPMV45A:4440/cmbVBAK-AUGRU").key = motivoFinalParaSAP
     Else
         Sheets("Criação").Cells(firstRow, "I").Value = "ERRO: Código '" & codigoParaBusca & "' não encontrado na aba 'Código'."
         GoTo ProximoGrupo
     End If
+    '--- Fim da Lógica de Motivo
     
     If InStr(1, Sheets("Criação").Cells(firstRow, "G").Value, "668") > 0 Then
         GoTo OIROB
     End If
     
-    session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_MKAL").press
+    '************************************************************************************************
+    '*** INÍCIO DA LÓGICA DE ITENS 100% RESTAURADA DO SCRIPT ANTIGO ***
+    '************************************************************************************************
     
-    For Each itemRow In invoiceRows
-        If Sheets("Criação").Cells(itemRow, "H").Value > 0 Then
+    cont = 1
+    Do While cont <= invoiceRows.Count
+        itemRow = invoiceRows(cont)
+
+        If Sheets("Criação").Cells(itemRow, "H").Value <= 0 Then
+            ' Pula para o próximo item se a quantidade for zero
+            cont = cont + 1
+        Else
+            If cont > 1 Then GoTo mais
             
-            session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press
+            session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_MKAL").press 'SELECIONA TD
+mais:
+            If cont > 1 Then
+                session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_MKLO").press
+                session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_MKAL").press
+            End If
+            
+            session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POPO").press 'PROCURA
             
             Itemloop = Sheets("Criação").Cells(itemRow, "D").Value
             session.findById("wnd[1]/usr/ctxtRV45A-PO_MATNR").Text = Itemloop
@@ -309,9 +325,8 @@ End If
                 GoTo ProximoGrupo
             End If
             On Error GoTo 0
-            erroitem = ""
-
-            session.findById("wnd[0]").sendVKey 9
+            
+            session.findById("wnd[0]").sendVKey 9 'Desmarca a linha
 
             session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").SetFocus
             Itemq = session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").Text
@@ -323,22 +338,19 @@ End If
                 GoTo ProximoGrupo
             End If
 
-            If session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").Text >= Sheets("Criação").Cells(itemRow, "H").Value Then
-                session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").Text = Sheets("Criação").Cells(itemRow, "H").Value
-            End If
+            session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").Text = Sheets("Criação").Cells(itemRow, "H").Value
             
+            cont = cont + 1
         End If
-    Next itemRow
-
-    '************************************************************************************************
-    '*** INÍCIO DA ALTERAÇÃO - Reintroduzindo a verificação de segurança do código antigo ***
-    '************************************************************************************************
+    Loop
+    
     On Error Resume Next
     Item2 = session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,1]").Text
+    If Err.Number <> 0 Then Item2 = ""
     On Error GoTo 0
     
     If Item2 = "" Then
-        GoTo pularDelete ' Se não houver um segundo item, pule a exclusão
+        GoTo pularDelete
     End If
     
     session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POLO").press
@@ -348,11 +360,13 @@ End If
     
 pularDelete:
     '************************************************************************************************
-    '*** FIM DA ALTERAÇÃO ***
+    '*** FIM DA LÓGICA RESTAURADA ***
     '************************************************************************************************
 
 OIROB:
     session.findById("wnd[0]/usr/subSUBSCREEN_HEADER:SAPMV45A:4021/btnBT_HEAD").press
+    ' ... O resto do código continua igual ...
+    
     session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_HEAD/tabpT\04").Select
 
     If InStr(1, Sheets("Criação").Cells(firstRow, "G").Value, "668") = 0 Then
@@ -455,36 +469,31 @@ ProximoGrupo:
 
 Next invoiceKey
 
-' --- NOVO: PÓS-PROCESSAMENTO PARA CORRIGIR LINHAS COM "X" ---
+' --- PÓS-PROCESSAMENTO PARA CORRIGIR LINHAS COM "X" ---
 Dim nfToFind As String
 Dim clientToFind As String
 Dim masterResult As String
 
 For i = 2 To lastRow
-    ' Verifica se a célula na coluna I contém "X"
     If UCase(Trim(Sheets("Criação").Cells(i, "I").Value)) = "X" Then
-        ' Armazena a NF e o Cliente da linha "X" para procurar a linha mestre
         nfToFind = Trim(Sheets("Criação").Cells(i, "F").Value)
         clientToFind = Trim(Sheets("Criação").Cells(i, "B").Value)
-        masterResult = "" ' Reseta a variável de resultado
+        masterResult = ""
 
-        ' Procura pela linha mestre (mesma NF/Cliente, com "Duplicado" e um resultado válido)
         For j = 2 To lastRow
             If Trim(Sheets("Criação").Cells(j, "F").Value) = nfToFind And _
                Trim(Sheets("Criação").Cells(j, "B").Value) = clientToFind Then
                 
-                ' Verifica se é a linha mestre (marcada como "Duplicado" e com um resultado que não seja "X" ou vazio)
                 If UCase(Trim(Sheets("Criação").Cells(j, "K").Value)) = "DUPLICADO" And _
                    Trim(Sheets("Criação").Cells(j, "I").Value) <> "" And _
                    UCase(Trim(Sheets("Criação").Cells(j, "I").Value)) <> "X" Then
                     
                     masterResult = Sheets("Criação").Cells(j, "I").Value
-                    Exit For ' Encontrou a linha mestre, pode sair do loop de busca
+                    Exit For
                 End If
             End If
         Next j
 
-        ' Se um resultado mestre foi encontrado, atualiza a linha "X"
         If masterResult <> "" Then
             Sheets("Criação").Cells(i, "I").Value = masterResult
         End If
