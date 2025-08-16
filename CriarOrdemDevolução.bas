@@ -1,4 +1,3 @@
-Attribute VB_Name = "Modulo 3"
 Sub CriarOrdemDevolucao()
 
 ' Declaração de todas as variáveis utilizadas na macro.
@@ -284,11 +283,6 @@ End If
         GoTo OIROB
     End If
     
-    '************************************************************************************************
-    '*** INÍCIO DA ALTERAÇÃO ***
-    '************************************************************************************************
-    
-    ' ETAPA 1: Seleciona todas as linhas ANTES de começar o loop
     session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_MKAL").press
     
     For Each itemRow In invoiceRows
@@ -317,7 +311,6 @@ End If
             On Error GoTo 0
             erroitem = ""
 
-            ' ETAPA 2 (A CHAVE): Desmarca a linha do item que queremos MANTER.
             session.findById("wnd[0]").sendVKey 9
 
             session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,0]").SetFocus
@@ -337,12 +330,23 @@ End If
         End If
     Next itemRow
 
-    ' ETAPA 3: Apaga de uma só vez TODAS as linhas que sobraram selecionadas
+    '************************************************************************************************
+    '*** INÍCIO DA ALTERAÇÃO - Reintroduzindo a verificação de segurança do código antigo ***
+    '************************************************************************************************
+    On Error Resume Next
+    Item2 = session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/tblSAPMV45ATCTRL_U_ERF_AUFTRAG/txtRV45A-KWMENG[2,1]").Text
+    On Error GoTo 0
+    
+    If Item2 = "" Then
+        GoTo pularDelete ' Se não houver um segundo item, pule a exclusão
+    End If
+    
     session.findById("wnd[0]/usr/tabsTAXI_TABSTRIP_OVERVIEW/tabpT\01/ssubSUBSCREEN_BODY:SAPMV45A:4400/subSUBSCREEN_TC:SAPMV45A:4900/subSUBSCREEN_BUTTONS:SAPMV45A:4050/btnBT_POLO").press
-    On Error Resume Next ' Caso popup de confirmação apareça
+    On Error Resume Next
     session.findById("wnd[1]/usr/btnSPOP-OPTION1").press
     On Error GoTo 0
     
+pularDelete:
     '************************************************************************************************
     '*** FIM DA ALTERAÇÃO ***
     '************************************************************************************************
